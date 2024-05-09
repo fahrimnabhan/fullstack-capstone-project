@@ -3,7 +3,7 @@ import { urlConfig } from '../../config';
 import { useAppContext } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import './LoginPage.css';
-import { post } from '../../../../giftlink-backend/routes/authRoutes';
+//import { post } from '../../../../giftlink-backend/routes/authRoutes';
 
 function LoginPage() {
 
