@@ -5,39 +5,39 @@ import {urlConfig} from '../../config';
 import { useAppContext } from '../../context/AuthContext';
 
 const Profile = () => {
-  const [userDetails, setUserDetails] = useState({});
- const [updatedDetails, setUpdatedDetails] = useState({});
- const {setUserName} = useAppContext();
- const [changed, setChanged] = useState("");
+const [userDetails, setUserDetails] = useState({});
+const [updatedDetails, setUpdatedDetails] = useState({});
+const {setUserName} = useAppContext();
+const [changed, setChanged] = useState("");
 
- const [editMode, setEditMode] = useState(false);
-  const navigate = useNavigate();
-  useEffect(() => {
+const [editMode, setEditMode] = useState(false);
+const navigate = useNavigate();
+useEffect(() => {
     const authtoken = sessionStorage.getItem("auth-token");
     if (!authtoken) {
       navigate("/app/login");
     } else {
       fetchUserProfile();
     }
-  }, [navigate]);
+}, [navigate]);
 
-  const fetchUserProfile = async () => {
+const fetchUserProfile = async () => {
     try {
-      const authtoken = sessionStorage.getItem("auth-token");
-      const email = sessionStorage.getItem("email");
-      const name=sessionStorage.getItem('name');
-      if (name || authtoken) {
-                const storedUserDetails = {
-                  name: name,
-                  email:email
-                };
+        const authtoken = sessionStorage.getItem("auth-token");
+        const email = sessionStorage.getItem("email");
+        const name=sessionStorage.getItem('name');
+        if (name || authtoken) {
+                    const storedUserDetails = {
+                    name: name,
+                    email:email
+                    };
 
-                setUserDetails(storedUserDetails);
-                setUpdatedDetails(storedUserDetails);
-              }
+                    setUserDetails(storedUserDetails);
+                    setUpdatedDetails(storedUserDetails);
+                }
 } catch (error) {
-  console.error(error);
-  // Handle error case
+    console.error(error);
+    // Handle error case
 }
 };
 
@@ -47,73 +47,82 @@ setEditMode(true);
 
 const handleInputChange = (e) => {
 setUpdatedDetails({
-  ...updatedDetails,
-  [e.target.name]: e.target.value,
+    ...updatedDetails,
+    [e.target.name]: e.target.value,
 });
 };
 const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  try {
-    const authtoken = sessionStorage.getItem("auth-token");
-    const email = sessionStorage.getItem("email");
+    try {
+        const authtoken = sessionStorage.getItem("auth-token");
+        const email = sessionStorage.getItem("email");
 
-    if (!authtoken || !email) {
-      navigate("/app/login");
-      return;
+        if (!authtoken || !email) {
+            navigate("/app/login");
+            return;
+        }
+
+        const payload = { ...updatedDetails };
+        const response = await fetch(`${urlConfig.backendUrl}/api/auth/update`, {
+            //Step 1: Task 1
+            method: 'PUT',
+            //Step 1: Task 2
+            headers: {
+                "Authorization": `Bearer ${authtoken}`,
+                "Content-Type": "application/json",
+                "Email": email,
+            },
+            //Step 1: Task 3
+            body: JSON.stringify(payload),
+        });
+
+        if (response.ok) {
+        // Update the user details in session storage
+        //Step 1: Task 4
+        setUserName(updatedDetails.name);
+        //Step 1: Task 5
+        sessionStorage.setItem("name", updatedDetails.name);
+        setUserDetails(updatedDetails);
+        setEditMode(false);
+        // Display success message to the user
+        setChanged("Name Changed Successfully!");
+        setTimeout(() => {
+            setChanged("");
+            navigate("/");
+        }, 1000);
+
+        } else {
+        // Handle error case
+        throw new Error("Failed to update profile");
+        }
+    } catch (error) {
+        console.error(error);
+        // Handle error case
     }
-
-    const payload = { ...updatedDetails };
-    const response = await fetch(`${urlConfig.backendUrl}/api/auth/update`, {
-      //Step 1: Task 1
-      //Step 1: Task 2
-      //Step 1: Task 3
-    });
-
-    if (response.ok) {
-      // Update the user details in session storage
-      //Step 1: Task 4
-      //Step 1: Task 5
-      setUserDetails(updatedDetails);
-      setEditMode(false);
-      // Display success message to the user
-      setChanged("Name Changed Successfully!");
-      setTimeout(() => {
-        setChanged("");
-        navigate("/");
-      }, 1000);
-
-    } else {
-      // Handle error case
-      throw new Error("Failed to update profile");
-    }
-  } catch (error) {
-    console.error(error);
-    // Handle error case
-  }
 };
 
 return (
 <div className="profile-container">
-  {editMode ? (
+    {editMode ? (
 <form onSubmit={handleSubmit}>
 <label>
-  Email
-  <input
-    type="email"
-    name="email"
-    value={userDetails.email}
-    disabled // Disable the email field
-  />
+    Email
+    <input
+        type="email"
+        name="email"
+        value={userDetails.email}
+        disabled // Disable the email field
+    />
 </label>
 <label>
-   Name
-   <input
-     type="text"
-     name="name"
-     value={updatedDetails.name}
-     onChange={handleInputChange}
-   />
+    Name
+    <input
+        type="text"
+        name="name"
+        value={updatedDetails.name}
+        onChange={handleInputChange}
+    />
 </label>
 
 <button type="submit">Save</button>
