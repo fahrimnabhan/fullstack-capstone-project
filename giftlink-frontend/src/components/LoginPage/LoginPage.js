@@ -14,7 +14,7 @@ function LoginPage() {
 
     const navigate = useNavigate();
     const bearerToken = sessionStorage.getItem('bearer-token');
-    const { setIsLoggedIn } = useAppContect();
+    const { setIsLoggedIn } = useAppContext();
 
     useEffect(() => {
         if (sessionStorage.getItem('auth-token')) {
@@ -23,7 +23,7 @@ function LoginPage() {
     }, [navigate])
 
     // insert code here to create handleLogin function and include console.log
-    const handleLogin = async () => {
+    const handleLogin = async (e) => {
         
         try{
             e.preventDefault();
