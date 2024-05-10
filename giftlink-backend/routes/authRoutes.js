@@ -8,11 +8,10 @@ const router = express.Router();
 const dotenv = require('dotenv');
 const pino = require('pino');
 
-const { body, validationResult } = require('express-validator');
+dotenv.config();
 
 const logger = pino();
 
-dotenv.config();
 //Step 1 - Task 4: Create JWT secret
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -24,6 +23,11 @@ router.post('/register', async (req, res) => {
         const collection = db.collection("users");
         //Task 3: Check for existing email
         const existingEmail = await collection.findOne({ email: req.body.email });
+
+        if (existingEmail) {
+            logger.error('Email already exist. Please do login with your email or register with another email.');
+            return res.status(400).json({ error: 'Email already exists' });
+        }
         const salt = await bcryptjs.genSalt(10);
         const hash = await bcryptjs.hash(req.body.password, salt);
         const email = req.body.email;
@@ -44,7 +48,7 @@ router.post('/register', async (req, res) => {
 
         const authtoken = jwt.sign(payload, JWT_SECRET);
         logger.info('User registered successfully');
-        res.json({authtoken,email});
+        return res.status(200).json('User registered successfully',{ authtoken, email });
     } catch (e) {
          return res.status(500).send('Internal server error');
     }
@@ -75,7 +79,7 @@ router.post('/login', async (req, res) => {
             const userEmail = theUser.email;
             // Task 6: Create JWT authentication if passwords match with user._id as payload
             
-            const authtoken = jwt.sign(user._id, JWT_SECRET)
+            const authtoken = jwt.sign(payload, JWT_SECRET)
             logger.info('User logged in successfully');
             return res.status(200).json({ authtoken, userName, userEmail });
         } else {

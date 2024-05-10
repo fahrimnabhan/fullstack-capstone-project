@@ -18,7 +18,7 @@ function RegisterPage() {
     // insert code here to create handleRegister function and include console.log
     const handleRegister = async () => {
         try{
-            const response = await fetch(`${urlConfig.backendUrl}/api/auth/resiter`, {
+            const response = await fetch(`${urlConfig.backendUrl}/api/auth/register`, {
                 method: 'POST',
                 headers: {
                     'content-type': 'application/json',
@@ -64,7 +64,7 @@ function RegisterPage() {
                                 id="firstName"
                                 type='text'
                                 className='form-control'
-                                placeholder='Enter your firstName'
+                                placeholder='Enter your first name'
                                 value={firstName}
                                 onChange={(e) => setFirstName(e.target.value)}
                             />
@@ -76,7 +76,7 @@ function RegisterPage() {
                                 id="lastName"
                                 type='text'
                                 className='form-control'
-                                placeholder='Enter your lastName'
+                                placeholder='Enter your last name'
                                 value={lastName}
                                 onChange={(e) => setLastName(e.target.value)}
                             />
